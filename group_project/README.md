@@ -202,12 +202,12 @@ flowchart TD
 
 ## Phân Công Công Việc
 
-| Thành viên           | MSSV        | Nhiệm vụ | Trạng thái |
-| ---------------------- | ----------- | ---------- | ------------ |
-| Hoàng Văn Anh        | 2A202600762 |            |              |
-| Nguyễn Trường Giang | 2A202600792 |            |              |
-| Nguyễn Lý Minh Kỳ   | 2A202600782 |            |              |
-| Phạm Ánh Dương     | 2A202600815 |            |              |
+| Thành viên           | MSSV        | Nhiệm vụ                                                                                              | Trạng thái |
+| ---------------------- | ----------- | ------------------------------------------------------------------------------------------------------- | ------------ |
+| Hoàng Văn Anh        | 2A202600762 | Craw data, convert to mark down, chunk index, RAG chatbot, Workflow system, Write mark down             |              |
+| Nguyễn Trường Giang | 2A202600792 |                                                                                                         |              |
+| Nguyễn Lý Minh Kỳ   | 2A202600782 | semantic search, reranking, retrieval pipeline, generation có citation ở backend, sample streamlit UI | Done         |
+| Phạm Ánh Dương     | 2A202600815 |                                                                                                         |              |
 
 ---
 
