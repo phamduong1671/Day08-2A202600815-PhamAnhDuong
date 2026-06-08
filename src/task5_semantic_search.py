@@ -19,10 +19,20 @@ from .config import COLLECTION_NAME
 from .task4_chunking_indexing import (
     EMBEDDING_DIM,
     EMBEDDING_MODEL,
+    LOCAL_INDEX_METADATA_PATH,
     LOCAL_INDEX_PATH,
     _connect_weaviate,
     _hash_embedding,
 )
+
+
+def _index_uses_hash_embedding() -> bool:
+    """Index có được tạo bằng hash-fallback không? (đọc metadata Task 4)."""
+    try:
+        meta = json.loads(LOCAL_INDEX_METADATA_PATH.read_text(encoding="utf-8"))
+        return "hash-fallback" in str(meta.get("embedding_model", ""))
+    except Exception:
+        return False
 
 
 def _load_query_model():
@@ -120,8 +130,16 @@ def _pseudo_query_embedding(query: str, max_seed_chunks: int = 12) -> list[float
 
 
 def _embed_query(query: str) -> list[float]:
-    """Embed query bằng đúng model đã dùng ở Task 4."""
-    if os.getenv("USE_BGE_QUERY_MODEL", "0") == "1":
+    """
+    Embed query bằng ĐÚNG model đã dùng ở Task 4.
+
+    Quan trọng: query và index phải cùng không gian vector, nếu không cosine vô
+    nghĩa. Vì vậy mặc định dùng bge-m3 khi index là bge-m3 thật; chỉ dùng
+    hash/pseudo khi index cũng là hash-fallback. Env USE_BGE_QUERY_MODEL=0/1 để ép.
+    """
+    env = os.getenv("USE_BGE_QUERY_MODEL")
+    use_model = (env == "1") if env is not None else (not _index_uses_hash_embedding())
+    if use_model:
         try:
             model = _load_query_model()
             embedding = model.encode(query, normalize_embeddings=True)
