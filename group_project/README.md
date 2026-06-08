@@ -1,178 +1,206 @@
-# Bài Tập Nhóm — Search Engine / RAG Chatbot
+# Group Project — Full RAG Pipeline + Evaluation
 
-## Mục Tiêu
+## Mục Tiêu Hiện Tại
 
-Sau khi hoàn thành bài cá nhân, nhóm ngồi lại để xây dựng **1 trong 2 sản phẩm**:
-
----
-
-## Yêu cầu 1:  Sản phẩm nhóm RAG Chatbot
-
-Xây dựng chatbot trả lời câu hỏi về pháp luật ma tuý và tin tức liên quan.
-
-**Yêu cầu:**
-- Giao diện chat (Streamlit / Gradio / Chainlit)
-- Trả lời có citation (dựa trên Task 10)
-- Hỗ trợ follow-up questions (conversation memory)
-- Hiển thị source documents đã dùng
-
-**Stack gợi ý:**
-```
-Chainlit/Streamlit → Retrieval (Task 9) → Generation (Task 10) → Display
-```
+Build đầy đủ RAG pipeline cho chatbot hỏi đáp về pháp luật ma túy và tin tức liên quan, kèm evaluation pipeline. Trong giai đoạn chờ golden dataset mới, evaluation mặc định chạy sample 2 Q&A đầu tiên để smoke test toàn bộ pipeline.
 
 ---
 
-## Yêu cầu 2: RAG Evaluation Pipeline
+## Kiến Trúc
 
-Sử dụng **1 trong 3 framework** sau để evaluate pipeline RAG của nhóm:
+```text
+data/landing
+  -> data/standardized
+  -> Task 4 chunking + embedding + Weaviate index
+  -> Task 5 semantic search
+  -> Task 6 BM25 lexical search
+  -> Task 9 RRF merge + optional rerank + PageIndex fallback
+  -> Task 10 generation có citation
+  -> app.py Streamlit chatbot + conversation memory + source display
 
-### Framework lựa chọn
-
-| Framework | Cài đặt | Đặc điểm |
-|-----------|---------|-----------|
-| [DeepEval](https://github.com/confident-ai/deepeval) | `pip install deepeval` | Nhiều metric built-in, dễ integrate với pytest |
-| [RAGAS](https://github.com/explodinggradients/ragas) | `pip install ragas` | Chuẩn industry cho RAG eval, 3 trục chính |
-| [TruLens](https://github.com/truera/trulens) | `pip install trulens` | Dashboard UI, feedback functions mạnh |
-
-### Yêu cầu Evaluation
-
-1. **Tạo Golden Dataset** — tối thiểu 15 cặp Q&A (question, expected_answer, expected_context)
-2. **Chạy evaluation** trên toàn bộ golden dataset với các metrics sau:
-   - **Faithfulness** — câu trả lời có bám đúng context không?
-   - **Answer Relevance** — câu trả lời có đúng câu hỏi không?
-   - **Context Recall** — retriever có lấy đủ evidence không?
-   - **Context Precision** — trong context lấy về, bao nhiêu % thực sự hữu ích?
-3. **So sánh A/B** — chạy eval trên ít nhất 2 config khác nhau (ví dụ: có reranking vs không reranking, hoặc hybrid vs dense-only)
-4. **Báo cáo** — bảng điểm + phân tích worst performers + đề xuất cải tiến
-
-### Code mẫu — DeepEval
-
-```python
-from deepeval import evaluate
-from deepeval.metrics import (
-    FaithfulnessMetric,
-    AnswerRelevancyMetric,
-    ContextualRecallMetric,
-    ContextualPrecisionMetric,
-)
-from deepeval.test_case import LLMTestCase
-
-# Tạo test cases từ golden dataset
-test_cases = []
-for item in golden_dataset:
-    result = rag_pipeline.generate_with_citation(item["question"])
-    test_case = LLMTestCase(
-        input=item["question"],
-        actual_output=result["answer"],
-        expected_output=item["expected_answer"],
-        retrieval_context=[c["content"] for c in result["sources"]],
-    )
-    test_cases.append(test_case)
-
-# Chạy evaluation
-metrics = [
-    FaithfulnessMetric(threshold=0.7),
-    AnswerRelevancyMetric(threshold=0.7),
-    ContextualRecallMetric(threshold=0.7),
-    ContextualPrecisionMetric(threshold=0.7),
-]
-
-results = evaluate(test_cases, metrics)
+group_project/evaluation/golden_dataset.json
+  -> eval_pipeline.py
+  -> DeepEval metrics
+  -> A/B: hybrid+rerank vs hybrid no-rerank
+  -> results.md
 ```
-
-### Code mẫu — RAGAS
-
-```python
-from ragas import evaluate
-from ragas.metrics import (
-    faithfulness,
-    answer_relevancy,
-    context_recall,
-    context_precision,
-)
-from datasets import Dataset
-
-# Chuẩn bị data
-eval_data = {
-    "question": [],
-    "answer": [],
-    "contexts": [],
-    "ground_truth": [],
-}
-
-for item in golden_dataset:
-    result = rag_pipeline.generate_with_citation(item["question"])
-    eval_data["question"].append(item["question"])
-    eval_data["answer"].append(result["answer"])
-    eval_data["contexts"].append([c["content"] for c in result["sources"]])
-    eval_data["ground_truth"].append(item["expected_answer"])
-
-dataset = Dataset.from_dict(eval_data)
-
-# Chạy evaluation
-result = evaluate(
-    dataset,
-    metrics=[faithfulness, answer_relevancy, context_recall, context_precision],
-)
-print(result.to_pandas())
-```
-
-### Code mẫu — TruLens
-
-```python
-from trulens.apps.custom import TruCustomApp, instrument
-from trulens.core import Feedback
-from trulens.providers.openai import OpenAI as TruOpenAI
-
-provider = TruOpenAI()
-
-# Define feedback functions
-f_faithfulness = Feedback(provider.groundedness_measure_with_cot_reasons).on_output()
-f_relevance = Feedback(provider.relevance).on_input_output()
-f_context_relevance = Feedback(provider.context_relevance).on_input()
-
-# Wrap RAG pipeline
-tru_rag = TruCustomApp(
-    rag_pipeline,
-    app_name="DrugLaw_RAG",
-    feedbacks=[f_faithfulness, f_relevance, f_context_relevance],
-)
-
-# Run evaluation
-with tru_rag as recording:
-    for item in golden_dataset:
-        rag_pipeline.generate_with_citation(item["question"])
-
-# View dashboard
-from trulens.dashboard import run_dashboard
-run_dashboard()
-```
-
-### Deliverable Evaluation
-
-- [ ] File `group_project/evaluation/golden_dataset.json` — 15+ cặp Q&A
-- [ ] File `group_project/evaluation/eval_pipeline.py` — script chạy evaluation
-- [ ] File `group_project/evaluation/results.md` — bảng điểm + phân tích
-- [ ] So sánh A/B ít nhất 2 configs
 
 ---
 
-## Yêu Cầu Chung
+## Option 1 — RAG Chatbot
 
-1. **Tích hợp pipeline** từ bài cá nhân của các thành viên
-2. **Demo hoạt động được** trong buổi trình bày (chạy local hoặc deploy)
-3. **Evaluation pipeline** chạy được và có báo cáo kết quả
-4. **Code push lên repository** chung của nhóm
-5. **README** mô tả kiến trúc và phân công (điền bên dưới)
+- [x] Giao diện Streamlit
+- [x] Chat UI bằng `st.chat_message` và `st.chat_input`
+- [x] Trả lời bằng full RAG pipeline `src.task10_generation.generate_with_citation`
+- [x] Citation trong câu trả lời theo prompt Task 10
+- [x] Conversation memory cho follow-up questions
+- [x] Hiển thị source documents đã dùng cho từng câu trả lời
+- [x] Lưu source documents trong `st.session_state` để rerun vẫn thấy nguồn cũ
+- [x] Cho phép bật/tắt cross-encoder reranking trong UI
+- [x] Cho phép chỉnh số source chunks `top_k`
+
+Entrypoint:
+
+```bash
+streamlit run app.py
+```
 
 ---
 
-## Kiến Trúc Hệ Thống
+## Option 2 — RAG Evaluation Pipeline
 
+- [x] Framework: DeepEval
+- [x] Golden dataset file: `group_project/evaluation/golden_dataset.json`
+- [x] Dataset hiện tại: 48 câu Q&A
+- [x] Smoke test mặc định: 2 câu đầu trong dataset
+- [x] Metrics: Faithfulness, Answer Relevancy, Contextual Recall, Contextual Precision
+- [x] A/B comparison: hybrid + rerank vs hybrid no-rerank
+- [x] Report file: `group_project/evaluation/results.md`
+- [x] A/B no-rerank không bị PageIndex fallback làm lệch kết quả RRF
+- [x] Evaluation load `.env` trước khi tạo DeepEval judge/model client
+- [x] Sample 2 Q&A đã chạy và ghi report
+- [ ] Full evaluation: chạy sau khi golden dataset mới/chốt đáp án được cập nhật
+
+Chạy smoke test mặc định 2 câu:
+
+```bash
+python -m group_project.evaluation.eval_pipeline
 ```
-[Vẽ diagram kiến trúc ở đây]
+
+Chạy N câu:
+
+```bash
+EVAL_LIMIT=8 python -m group_project.evaluation.eval_pipeline
 ```
+
+Chạy toàn bộ dataset:
+
+```bash
+EVAL_LIMIT=0 python -m group_project.evaluation.eval_pipeline
+```
+
+---
+
+## Pipeline Components
+
+- [x] Data landing legal/news
+- [x] Markdown standardized corpus
+- [x] Chunking: recursive splitter, `chunk_size=900`, `chunk_overlap=120`
+- [x] Embedding: `BAAI/bge-m3`, 1024 dimensions
+- [x] Vector store: Weaviate collection `DrugLawDocs`
+- [x] Dense retrieval: semantic search
+- [x] Sparse retrieval: BM25 + PyVi tokenization
+- [x] Fusion: Reciprocal Rank Fusion
+- [x] Reranking: `BAAI/bge-reranker-v2-m3`
+- [x] Fallback: PageIndex vectorless retrieval
+- [x] Generation: OpenAI-compatible chat completion with citation prompt
+- [x] Evaluation: DeepEval 4 metrics + A/B configs
+
+---
+
+## Cách Chạy
+
+### 1. Cài dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Cấu hình môi trường
+
+Tạo `.env` từ `.env.example`, tối thiểu cần:
+
+```bash
+OPENAI_API_KEY=...
+OPENAI_BASE_URL=...
+LLM_MODEL=...
+
+WEAVIATE_URL=...
+WEAVIATE_API_KEY=...
+WEAVIATE_COLLECTION=DrugLawDocs
+```
+
+Nếu dùng Ollama local, `OPENAI_BASE_URL` có thể trỏ về:
+
+```bash
+OPENAI_BASE_URL=http://localhost:11434/v1
+OPENAI_API_KEY=ollama
+LLM_MODEL=qwen2.5:7b-instruct
+```
+
+### 3. Build/rebuild index khi data thay đổi
+
+```bash
+python -m src.task4_chunking_indexing
+```
+
+### 4. Chạy chatbot
+
+```bash
+streamlit run app.py
+```
+
+### 5. Chạy evaluation
+
+```bash
+python -m group_project.evaluation.eval_pipeline
+```
+
+---
+
+## Việc Còn Lại Khi Có Golden Dataset Mới
+
+- [ ] Thay/cập nhật `group_project/evaluation/golden_dataset.json`
+- [ ] Chốt `expected_answer` và `expected_context`, bỏ các field `note` nếu không còn cần
+- [ ] Chạy `EVAL_LIMIT=0 python -m group_project.evaluation.eval_pipeline`
+- [ ] Review `results.md`: bảng A/B, worst performers, recommendations
+- [ ] Nếu dataset có nhiều câu news, kiểm tra retrieval trên `data/standardized/news`
+
+---
+
+## Checklist Hoàn Thiện Theo Yêu Cầu
+
+### Sản Phẩm RAG Chatbot
+
+- [x] Có giao diện chat Streamlit
+- [x] Có full RAG flow: retrieval -> generation -> answer
+- [x] Câu trả lời yêu cầu citation theo source trong prompt
+- [x] Có conversation memory cho follow-up
+- [x] Có source display cho từng assistant response
+- [x] Có control `top_k`
+- [x] Có control bật/tắt reranking
+- [x] Có xử lý lỗi pipeline để demo không crash UI
+
+### RAG Evaluation Pipeline
+
+- [x] Có `group_project/evaluation/golden_dataset.json`
+- [x] Golden dataset hiện tại có 48 Q&A, vượt yêu cầu tối thiểu 15
+- [x] Có `group_project/evaluation/eval_pipeline.py`
+- [x] Có DeepEval judge/model setup
+- [x] Có Faithfulness metric
+- [x] Có Answer Relevancy metric
+- [x] Có Contextual Recall metric
+- [x] Có Contextual Precision metric
+- [x] Có A/B config 1: hybrid + rerank
+- [x] Có A/B config 2: hybrid no-rerank
+- [x] No-rerank config dùng RRF trực tiếp, không bị fallback threshold sai thang điểm
+- [x] Có `group_project/evaluation/results.md`
+- [x] Có bảng điểm A/B cho sample 2 Q&A
+- [x] Có phân tích worst performers hoặc ghi rõ không có case dưới threshold
+- [x] Có recommendations
+- [x] Có cách chạy sample 2 Q&A mặc định
+- [x] Có cách chạy full dataset bằng `EVAL_LIMIT=0`
+
+### Yêu Cầu Chung
+
+- [x] Tích hợp pipeline từ các task cá nhân vào flow chung
+- [x] Demo local bằng `streamlit run app.py`
+- [x] Evaluation pipeline chạy được với sample 2 Q&A
+- [x] README mô tả kiến trúc
+- [x] README mô tả cách chạy
+- [x] README có checklist trạng thái
+- [ ] Cập nhật phân công thật của thành viên nhóm
+- [ ] Push/commit lên repository chung
 
 ---
 
@@ -180,25 +208,7 @@ run_dashboard()
 
 | Thành viên | MSSV | Nhiệm vụ | Trạng thái |
 |-----------|------|----------|------------|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
-
----
-
-## Hướng Dẫn Chạy
-
-```bash
-# Cài đặt dependencies
-pip install -r requirements.txt
-
-# Chạy app
-streamlit run app.py
-# hoặc
-chainlit run app.py
-```
-
----
-
-## Lưu ý: Hãy giữ lại repo này nếu như bạn học track 3 giai đoạn 2, chúng ta sẽ phát triển tiếp dự án lên knowledge graph để khắc phục các câu hỏi hóc búa khi có các câu hỏi khó.
+| TBD | TBD | Data + standardized corpus | Done |
+| TBD | TBD | Retrieval pipeline | Done |
+| TBD | TBD | RAG chatbot UI | Done |
+| TBD | TBD | Evaluation sample 2 Q&A + report | Done |

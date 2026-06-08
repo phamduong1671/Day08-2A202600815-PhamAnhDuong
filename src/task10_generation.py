@@ -80,14 +80,26 @@ def format_context(chunks: list[dict]) -> str:
 # GENERATION
 # =============================================================================
 
-def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
+def generate_with_citation(
+    query: str,
+    top_k: int = TOP_K,
+    use_reranking: bool = True,
+    score_threshold: float | None = None,
+) -> dict:
     """
     End-to-end RAG generation có citation.
+
+    Args:
+        use_reranking: bật/tắt cross-encoder rerank ở tầng retrieval (dùng cho A/B eval).
+        score_threshold: override ngưỡng fallback ở tầng retrieval.
 
     Returns:
         {'answer': str, 'sources': list[dict], 'retrieval_source': str}
     """
-    chunks = retrieve(query, top_k=top_k)
+    retrieve_kwargs = {"top_k": top_k, "use_reranking": use_reranking}
+    if score_threshold is not None:
+        retrieve_kwargs["score_threshold"] = score_threshold
+    chunks = retrieve(query, **retrieve_kwargs)
 
     if not chunks:
         return {
