@@ -1,19 +1,19 @@
 """
 Task 6 — Lexical Search Module (BM25).
 
-Mặc định sử dụng BM25. Nếu dùng phương pháp khác (TF-IDF, Elasticsearch,
-Weaviate BM25 built-in), hãy giải thích cơ chế trong buổi demo → +5 bonus.
-
-Cài đặt:
-    pip install rank-bm25
-
 BM25 hoạt động thế nào:
-    - Term Frequency (TF): từ xuất hiện nhiều trong document → điểm cao
-    - Inverse Document Frequency (IDF): từ hiếm → quan trọng hơn
-    - Document length normalization: document dài không bị ưu tiên quá mức
-    - Formula: score(q,d) = Σ IDF(qi) * (tf(qi,d) * (k1+1)) / (tf(qi,d) + k1*(1-b+b*|d|/avgdl))
-    - k1=1.5 (term saturation), b=0.75 (length normalization)
+    - Term Frequency (TF): từ xuất hiện nhiều trong document -> điểm cao.
+    - Inverse Document Frequency (IDF): từ hiếm -> quan trọng hơn.
+    - Length normalization: document dài không bị ưu tiên quá mức.
+    - score(q,d) = SUM IDF(qi) * (tf(qi,d)*(k1+1)) /
+      (tf(qi,d) + k1*(1-b+b*|d|/avgdl)).
+
+Với tiếng Việt, ưu tiên PyVi để biến từ ghép như "tàng trữ" thành một lexical
+unit (`tàng_trữ`). Nếu môi trường thiếu PyVi hoặc rank-bm25, module vẫn fallback
+về tokenizer regex + TF-IDF nhẹ để demo không vỡ.
 """
+
+from __future__ import annotations
 
 import math
 import re
@@ -25,7 +25,18 @@ TOKEN_PATTERN = re.compile(r"[\wÀ-ỹ]+", re.UNICODE)
 
 
 def _tokenize(text: str) -> list[str]:
-    return [token.lower() for token in TOKEN_PATTERN.findall(text) if len(token) >= 2]
+    """Word-segment tiếng Việt rồi lowercase. Fallback regex nếu PyVi lỗi."""
+    lowered = text.lower()
+    try:
+        from pyvi import ViTokenizer
+
+        return [
+            token
+            for token in ViTokenizer.tokenize(lowered).split()
+            if len(token.strip()) >= 2
+        ]
+    except Exception:
+        return [token for token in TOKEN_PATTERN.findall(lowered) if len(token) >= 2]
 
 
 @lru_cache(maxsize=1)
@@ -72,10 +83,13 @@ def build_bm25_index(corpus: list[dict]):
 
 @lru_cache(maxsize=1)
 def _get_bm25_index():
-    return build_bm25_index(list(_load_corpus()))
+    corpus = list(_load_corpus())
+    if not corpus:
+        return corpus, None
+    return corpus, build_bm25_index(corpus)
 
 
-def _fallback_keyword_scores(query_tokens: list[str], corpus: tuple[dict, ...]) -> list[float]:
+def _fallback_keyword_scores(query_tokens: list[str], corpus: list[dict]) -> list[float]:
     """TF-IDF nhẹ dùng khi môi trường thiếu `rank_bm25`."""
     if not query_tokens:
         return [0.0] * len(corpus)
@@ -115,22 +129,13 @@ def lexical_search(query: str, top_k: int = 10) -> list[dict]:
     """
     Tìm kiếm từ khóa sử dụng BM25.
 
-    Args:
-        query: Câu truy vấn
-        top_k: Số lượng kết quả tối đa
-
     Returns:
-        List of {
-            'content': str,
-            'score': float,      # BM25 score
-            'metadata': dict
-        }
-        Sorted by score descending.
+        List of {'content': str, 'score': float, 'metadata': dict}, sorted desc.
     """
     if top_k <= 0 or not query.strip():
         return []
 
-    corpus = _load_corpus()
+    corpus, bm25 = _get_bm25_index()
     if not corpus:
         return []
 
@@ -138,7 +143,6 @@ def lexical_search(query: str, top_k: int = 10) -> list[dict]:
     if not tokenized_query:
         return []
 
-    bm25 = _get_bm25_index()
     if bm25 is not None:
         raw_scores = [float(score) for score in bm25.get_scores(tokenized_query)]
     else:
@@ -169,7 +173,5 @@ def lexical_search(query: str, top_k: int = 10) -> list[dict]:
 
 
 if __name__ == "__main__":
-    # Test
-    results = lexical_search("Điều 248 tàng trữ trái phép chất ma tuý", top_k=5)
-    for r in results:
+    for r in lexical_search("Điều 248 tàng trữ trái phép chất ma tuý", top_k=5):
         print(f"[{r['score']:.3f}] {r['content'][:100]}...")

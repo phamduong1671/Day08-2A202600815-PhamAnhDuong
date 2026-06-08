@@ -1,40 +1,34 @@
 """
 Task 10 — Generation Có Citation.
 
-Hướng dẫn:
-    1. Chọn top_k, top_p phù hợp (giải thích lý do)
-    2. Sắp xếp lại chunks sau reranking để tránh "lost in the middle"
-    3. Inject context vào prompt
-    4. Yêu cầu LLM trả lời có citation
-    5. Nếu không đủ evidence → "I cannot verify this information"
+Pipeline: retrieve -> reorder (tránh lost-in-the-middle) -> format context có
+source/citation -> inject vào prompt -> gọi LLM -> trả answer có citation.
+
+Nếu LLM local/Ollama/OpenAI chưa sẵn sàng, module fallback sang câu trả lời
+extractive từ context để demo backend vẫn có citation và source documents.
 """
+
+from __future__ import annotations
 
 import os
 import re
-from dotenv import load_dotenv
 
-load_dotenv()
+try:
+    from .config import LLM_MODEL, get_llm_client
+except Exception:
+    LLM_MODEL = os.getenv("OPENAI_CHAT_MODEL", "gpt-4o-mini")
+    get_llm_client = None
 
 from .task9_retrieval_pipeline import retrieve
 
-
 # =============================================================================
-# CONFIGURATION — Giải thích lựa chọn
+# CONFIGURATION
 # =============================================================================
 
-# top_k: Số chunks đưa vào context
-# Chọn 5 vì: đủ evidence mà không quá dài gây lost in the middle
 TOP_K = 5
-
-# top_p (nucleus sampling): Xác suất tích luỹ cho token generation
-# Chọn 0.9 vì: đủ diverse nhưng không quá random
 TOP_P = 0.9
-
-# temperature: Độ ngẫu nhiên của output
-# Chọn 0.3 vì: RAG cần factual, ít sáng tạo
 TEMPERATURE = 0.3
 
-OPENAI_MODEL = os.getenv("OPENAI_CHAT_MODEL", "gpt-4o-mini")
 TOKEN_PATTERN = re.compile(r"[\wÀ-ỹ]+", re.UNICODE)
 
 SOURCE_LABELS = {
@@ -42,12 +36,8 @@ SOURCE_LABELS = {
     "luat-phong-chong-ma-tuy-2021": "Luật Phòng, chống ma túy 2021",
     "nghi-dinh-105-2021": "Nghị định 105/2021/NĐ-CP",
     "thong-tu-danh-muc-ma-tuy": "Thông tư danh mục chất ma túy",
+    "luat-phong-chong-ma-tuy-2021.pdf": "Luật Phòng, chống ma túy 2021",
 }
-
-
-# =============================================================================
-# SYSTEM PROMPT
-# =============================================================================
 
 SYSTEM_PROMPT = """Answer the following question comprehensively in Vietnamese.
 For every statement of fact or claim, immediately insert a citation in brackets
@@ -66,33 +56,22 @@ Rules:
 
 
 # =============================================================================
-# DOCUMENT REORDERING (tránh lost in the middle)
+# DOCUMENT REORDERING (tránh lost in the middle — Liu et al. 2023)
 # =============================================================================
 
 def reorder_for_llm(chunks: list[dict]) -> list[dict]:
     """
-    Sắp xếp chunks để tránh "lost in the middle" effect.
+    LLM chú ý tốt nhất ở ĐẦU và CUỐI prompt. Đặt chunk quan trọng ở hai biên,
+    kém quan trọng vào giữa.
 
-    LLM nhớ tốt thông tin ở ĐẦU và CUỐI prompt, quên thông tin ở GIỮA.
-    Strategy: đặt chunks quan trọng nhất ở đầu và cuối, kém quan trọng ở giữa.
-
-    Input order (by score):  [1, 2, 3, 4, 5]
-    Output order:            [1, 3, 5, 4, 2]
-    (best first, worst in middle, second-best last)
-
-    Args:
-        chunks: List sorted by score descending (from retrieval)
-
-    Returns:
-        List reordered để maximize LLM attention.
+    Input (sorted desc):  [0, 1, 2, 3, 4]
+    Output:               [0, 2, 4, 3, 1]
     """
     if len(chunks) <= 2:
         return list(chunks)
-
-    front = list(chunks[::2])
-    back = list(chunks[1::2])
-    back.reverse()
-    return front + back
+    firsts = list(chunks[0::2])
+    lasts = list(chunks[1::2][::-1])
+    return firsts + lasts
 
 
 def _source_stem(source: str) -> str:
@@ -103,17 +82,24 @@ def citation_label(chunk: dict, fallback_index: int = 1) -> str:
     """Tạo nhãn citation ngắn, ổn định cho source document."""
     metadata = chunk.get("metadata", {}) or {}
     source = metadata.get("source") or metadata.get("source_path") or f"Source {fallback_index}"
-    stem = _source_stem(str(source))
+    source = str(source)
+    stem = _source_stem(source)
 
+    if source in SOURCE_LABELS:
+        return SOURCE_LABELS[source]
     if stem in SOURCE_LABELS:
         return SOURCE_LABELS[stem]
+
+    title = metadata.get("title")
+    if title:
+        return str(title)
 
     content = chunk.get("content", "")
     title_match = re.search(r"^#\s+(.+)$", content, flags=re.MULTILINE)
     if title_match:
         return title_match.group(1).strip()
 
-    return str(source)
+    return source
 
 
 # =============================================================================
@@ -121,33 +107,22 @@ def citation_label(chunk: dict, fallback_index: int = 1) -> str:
 # =============================================================================
 
 def format_context(chunks: list[dict]) -> str:
-    """
-    Format chunks thành context string cho prompt.
-    Mỗi chunk có label source để LLM có thể cite.
-
-    Args:
-        chunks: List of {'content': str, 'metadata': dict, 'score': float}
-
-    Returns:
-        Formatted context string.
-    """
-    context_parts = []
+    """Format chunks thành context có nhãn source để LLM cite được."""
+    parts = []
     for i, chunk in enumerate(chunks, 1):
         metadata = chunk.get("metadata", {}) or {}
-        source = metadata.get("source", f"Source {i}")
+        source = metadata.get("source") or metadata.get("title") or f"Source {i}"
         source_path = metadata.get("source_path", "")
         doc_type = metadata.get("type", "unknown")
         citation = citation_label(chunk, fallback_index=i)
         score = float(chunk.get("score", 0.0))
-
-        context_parts.append(
+        parts.append(
             f"[Document {i} | Citation: {citation} | Source: {source} | "
             f"Type: {doc_type} | Score: {score:.3f}]\n"
             f"Path: {source_path}\n"
             f"{chunk.get('content', '')}\n"
         )
-
-    return "\n---\n".join(context_parts)
+    return "\n---\n".join(parts)
 
 
 def _tokenize(text: str) -> set[str]:
@@ -199,7 +174,7 @@ def _fallback_generate_answer(query: str, chunks: list[dict]) -> str:
     for index, chunk in enumerate(chunks, 1):
         label = citation_label(chunk, fallback_index=index)
         snippet = _best_snippet(query, chunk)
-        if not snippet or label in used_labels and len(lines) >= 2:
+        if not snippet or (label in used_labels and len(lines) >= 2):
             continue
 
         lines.append(f"- {snippet} [{label}]")
@@ -211,12 +186,6 @@ def _fallback_generate_answer(query: str, chunks: list[dict]) -> str:
         return "Tôi không thể xác minh thông tin này từ nguồn hiện có."
 
     return "Dựa trên các tài liệu tìm được:\n" + "\n".join(lines)
-
-
-def _has_openai_key() -> bool:
-    api_key = os.getenv("OPENAI_API_KEY", "").strip()
-    placeholders = {"", "your-api-key", "your_api_key", "OPENAI_API_KEY", "api_key_cua_ban"}
-    return api_key not in placeholders
 
 
 def _format_conversation_history(conversation_history: list[dict] | None) -> str:
@@ -232,6 +201,53 @@ def _format_conversation_history(conversation_history: list[dict] | None) -> str
     return "\n".join(formatted)
 
 
+def _call_llm(system_prompt: str, user_message: str) -> tuple[str, str]:
+    """
+    Gọi LLM qua src.config. Nếu không được, thử OpenAI mặc định rồi trả rỗng
+    để caller dùng extractive fallback.
+    """
+    try:
+        if get_llm_client is None:
+            raise RuntimeError("get_llm_client unavailable")
+        client = get_llm_client()
+        response = client.chat.completions.create(
+            model=LLM_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            temperature=TEMPERATURE,
+            top_p=TOP_P,
+        )
+        return response.choices[0].message.content or "", LLM_MODEL
+    except Exception as exc:
+        print(f"! Không gọi được configured LLM; thử OpenAI/default fallback ({type(exc).__name__})")
+
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+    placeholders = {"", "your-api-key", "your_api_key", "OPENAI_API_KEY", "api_key_cua_ban", "ollama"}
+    if api_key in placeholders:
+        return "", "local_context_extractive"
+
+    try:
+        from openai import OpenAI
+
+        model = os.getenv("OPENAI_CHAT_MODEL", "gpt-4o-mini")
+        client = OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            temperature=TEMPERATURE,
+            top_p=TOP_P,
+        )
+        return response.choices[0].message.content or "", model
+    except Exception as exc:
+        print(f"! Không gọi được OpenAI; dùng local generation fallback ({type(exc).__name__})")
+        return "", "local_context_extractive"
+
+
 # =============================================================================
 # GENERATION
 # =============================================================================
@@ -245,30 +261,32 @@ def generate_with_citation(
     """
     End-to-end RAG generation có citation.
 
-    Pipeline:
-        1. Retrieve relevant chunks
-        2. Reorder để tránh lost in the middle
-        3. Format context với source labels
-        4. Build prompt (system + context + query)
-        5. Call LLM
-        6. Return answer + sources
-
-    Args:
-        query: Câu hỏi của user
-
     Returns:
         {
-            'answer': str,           # Câu trả lời có citation
-            'sources': list[dict],   # Các chunks đã dùng
-            'retrieval_source': str  # 'hybrid' hoặc 'pageindex'
+            'answer': str,
+            'sources': list[dict],
+            'reordered_sources': list[dict],
+            'retrieval_source': str,
+            'retrieval_query': str,
+            'generation_backend': str,
         }
     """
     search_query = retrieval_query or query
     chunks = retrieve(search_query, top_k=top_k)
+
+    if not chunks:
+        return {
+            "answer": "Tôi không thể xác minh thông tin này từ nguồn hiện có.",
+            "sources": [],
+            "reordered_sources": [],
+            "retrieval_source": "none",
+            "retrieval_query": search_query,
+            "generation_backend": "none",
+        }
+
     reordered = reorder_for_llm(chunks)
     context = format_context(reordered)
     history = _format_conversation_history(conversation_history)
-
     user_message = f"""Conversation history:
 {history if history else '(none)'}
 
@@ -279,30 +297,10 @@ Context:
 
 Question: {query}"""
 
-    answer = ""
-    generation_backend = "local_context_extractive"
-
-    if _has_openai_key():
-        try:
-            from openai import OpenAI
-
-            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-            response = client.chat.completions.create(
-                model=OPENAI_MODEL,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_message},
-                ],
-                temperature=TEMPERATURE,
-                top_p=TOP_P,
-            )
-            answer = response.choices[0].message.content or ""
-            generation_backend = OPENAI_MODEL
-        except Exception as exc:
-            print(f"! Không gọi được OpenAI; dùng local generation fallback ({type(exc).__name__})")
-
+    answer, generation_backend = _call_llm(SYSTEM_PROMPT, user_message)
     if not answer.strip():
         answer = _fallback_generate_answer(query, reordered)
+        generation_backend = "local_context_extractive"
 
     return {
         "answer": answer,
@@ -320,11 +318,8 @@ if __name__ == "__main__":
         "Những nghệ sĩ nào đã bị bắt vì liên quan tới ma tuý?",
         "Quy trình cai nghiện bắt buộc theo Luật Phòng chống ma tuý 2021?",
     ]
-
     for q in test_queries:
-        print(f"\n{'='*70}")
-        print(f"Q: {q}")
-        print("=" * 70)
+        print(f"\n{'=' * 70}\nQ: {q}\n{'=' * 70}")
         result = generate_with_citation(q)
         print(f"\nA: {result['answer']}")
         print(f"\n[Sources: {len(result['sources'])} chunks | via {result['retrieval_source']}]")
