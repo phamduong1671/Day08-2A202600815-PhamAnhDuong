@@ -9,34 +9,6 @@
     "doc": "bo-luat-hinh-su-2017"
   },
   {
-    "id": "GD-002",
-    "question": "Khung hình phạt thấp nhất đối với tội tàng trữ trái phép chất ma túy là bao nhiêu năm tù?",
-    "expected_answer": "Khung hình phạt thấp nhất (Khoản 1, Điều 249) là phạt tù từ 01 năm đến 05 năm.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 249, Khoản 1",
-    "question_type": "penalty",
-    "difficulty": "easy",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
-    "id": "GD-003",
-    "question": "Tàng trữ khoảng bao nhiêu gam heroin thì bị xử phạt ở khung thấp nhất của tội tàng trữ trái phép chất ma túy?",
-    "expected_answer": "Tàng trữ heroin (hoặc cocaine, methamphetamine, amphetamine, MDMA) ở khối lượng nhỏ thuộc khung Khoản 1 Điều 249 thì bị phạt tù từ 01 đến 05 năm.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 249, Khoản 1",
-    "question_type": "penalty",
-    "difficulty": "medium",
-    "doc": "bo-luat-hinh-su-2017",
-    "note": "PHẢI đối chiếu ngưỡng khối lượng chính xác (ví dụ 0,1g đến dưới 5g) với văn bản gốc trước khi dùng làm đáp án chuẩn."
-  },
-  {
-    "id": "GD-004",
-    "question": "Tội vận chuyển trái phép chất ma túy quy định ở điều nào?",
-    "expected_answer": "Tội vận chuyển trái phép chất ma túy được quy định tại Điều 250 Bộ luật Hình sự.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 250",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
     "id": "GD-005",
     "question": "Tội mua bán trái phép chất ma túy có khung hình phạt cao nhất là gì?",
     "expected_answer": "Khung hình phạt cao nhất của tội mua bán trái phép chất ma túy (Điều 251) là phạt tù 20 năm, tù chung thân hoặc tử hình.",
@@ -47,104 +19,12 @@
     "note": "Đối chiếu khung hình phạt cao nhất với văn bản gốc."
   },
   {
-    "id": "GD-006",
-    "question": "Tội sản xuất trái phép chất ma túy quy định ở điều nào và khung hình phạt cơ bản?",
-    "expected_answer": "Tội sản xuất trái phép chất ma túy được quy định tại Điều 248; khung cơ bản (Khoản 1) là phạt tù từ 02 năm đến 07 năm.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 248",
-    "question_type": "penalty",
-    "difficulty": "medium",
-    "doc": "bo-luat-hinh-su-2017",
-    "note": "Xác nhận khung hình phạt Khoản 1 với văn bản gốc."
-  },
-  {
-    "id": "GD-007",
-    "question": "Tội tổ chức sử dụng trái phép chất ma túy được quy định ở điều nào?",
-    "expected_answer": "Tội tổ chức sử dụng trái phép chất ma túy được quy định tại Điều 255 Bộ luật Hình sự.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 255",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
     "id": "GD-008",
     "question": "Phân biệt tội tàng trữ và tội vận chuyển trái phép chất ma túy?",
     "expected_answer": "Tội tàng trữ trái phép chất ma túy (Điều 249) là hành vi cất giữ, giấu chất ma túy mà không nhằm mục đích mua bán hay vận chuyển; tội vận chuyển trái phép chất ma túy (Điều 250) là hành vi chuyển dịch chất ma túy từ nơi này đến nơi khác không nhằm mục đích mua bán. Hai tội được quy định tại hai điều luật riêng biệt.",
     "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 249 và Điều 250",
     "question_type": "comparison",
     "difficulty": "hard",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
-    "id": "GD-009",
-    "question": "Tội trồng cây thuốc phiện, cây cần sa quy định ở điều nào và khi nào bị truy cứu trách nhiệm hình sự?",
-    "expected_answer": "Tội trồng cây thuốc phiện, cây côca, cây cần sa hoặc các loại cây khác có chứa chất ma túy được quy định tại Điều 247. Người trồng chỉ bị truy cứu khi đã được giáo dục, đã bị xử phạt vi phạm hành chính hoặc đã bị kết án về hành vi này mà còn vi phạm, hoặc với số lượng cây lớn theo quy định.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 247",
-    "question_type": "factual_lookup",
-    "difficulty": "medium",
-    "doc": "bo-luat-hinh-su-2017",
-    "note": "Đối chiếu số lượng cây cấu thành tội phạm với văn bản gốc."
-  },
-  {
-    "id": "GD-010",
-    "question": "Tội chứa chấp việc sử dụng trái phép chất ma túy quy định ở điều nào?",
-    "expected_answer": "Tội chứa chấp việc sử dụng trái phép chất ma túy được quy định tại Điều 256 Bộ luật Hình sự.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 256",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
-    "id": "GD-011",
-    "question": "Tội cưỡng bức người khác sử dụng trái phép chất ma túy quy định ở điều nào?",
-    "expected_answer": "Tội cưỡng bức người khác sử dụng trái phép chất ma túy được quy định tại Điều 257 Bộ luật Hình sự.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 257",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
-    "id": "GD-012",
-    "question": "Tội lôi kéo người khác sử dụng trái phép chất ma túy quy định ở điều nào?",
-    "expected_answer": "Tội lôi kéo người khác sử dụng trái phép chất ma túy được quy định tại Điều 258 Bộ luật Hình sự.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 258",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
-    "id": "GD-013",
-    "question": "Tội chiếm đoạt chất ma túy quy định ở điều nào?",
-    "expected_answer": "Tội chiếm đoạt chất ma túy được quy định tại Điều 252 Bộ luật Hình sự.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 252",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
-    "id": "GD-014",
-    "question": "Hành vi tàng trữ, vận chuyển, mua bán hoặc chiếm đoạt tiền chất dùng vào việc sản xuất trái phép chất ma túy bị xử lý theo điều nào?",
-    "expected_answer": "Hành vi này được quy định tại Điều 253 Bộ luật Hình sự (tội tàng trữ, vận chuyển, mua bán hoặc chiếm đoạt tiền chất dùng vào việc sản xuất trái phép chất ma túy).",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 253",
-    "question_type": "factual_lookup",
-    "difficulty": "medium",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
-    "id": "GD-015",
-    "question": "Tội sản xuất, tàng trữ, vận chuyển hoặc mua bán phương tiện, dụng cụ dùng vào việc sản xuất hoặc sử dụng trái phép chất ma túy quy định ở điều nào?",
-    "expected_answer": "Tội này được quy định tại Điều 254 Bộ luật Hình sự.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 254",
-    "question_type": "factual_lookup",
-    "difficulty": "medium",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
-    "id": "GD-016",
-    "question": "Tội vi phạm quy định về quản lý chất ma túy, tiền chất, thuốc gây nghiện, thuốc hướng thần quy định ở điều nào?",
-    "expected_answer": "Tội này được quy định tại Điều 259 Bộ luật Hình sự.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 259",
-    "question_type": "factual_lookup",
-    "difficulty": "medium",
     "doc": "bo-luat-hinh-su-2017"
   },
   {
@@ -158,35 +38,6 @@
     "note": "Xác nhận lại danh sách tội có khung tử hình với văn bản gốc."
   },
   {
-    "id": "GD-018",
-    "question": "Các tội phạm về ma túy được quy định tại chương nào của Bộ luật Hình sự?",
-    "expected_answer": "Các tội phạm về ma túy được quy định tại Chương XX của Bộ luật Hình sự, từ Điều 247 đến Điều 259.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Chương XX",
-    "question_type": "scope",
-    "difficulty": "medium",
-    "doc": "bo-luat-hinh-su-2017"
-  },
-  {
-    "id": "GD-019",
-    "question": "Khung hình phạt cao nhất của tội tàng trữ trái phép chất ma túy là gì?",
-    "expected_answer": "Khung hình phạt cao nhất của tội tàng trữ trái phép chất ma túy (Điều 249) là phạt tù từ 15 năm đến 20 năm hoặc tù chung thân; tội này không có hình phạt tử hình.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 249",
-    "question_type": "penalty",
-    "difficulty": "medium",
-    "doc": "bo-luat-hinh-su-2017",
-    "note": "Đối chiếu khung hình phạt cao nhất và mức khối lượng tương ứng với văn bản gốc."
-  },
-  {
-    "id": "GD-020",
-    "question": "Tội tổ chức sử dụng trái phép chất ma túy có khung hình phạt cơ bản là bao nhiêu năm tù?",
-    "expected_answer": "Khung hình phạt cơ bản của tội tổ chức sử dụng trái phép chất ma túy (Khoản 1 Điều 255) là phạt tù từ 02 năm đến 07 năm.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 255, Khoản 1",
-    "question_type": "penalty",
-    "difficulty": "medium",
-    "doc": "bo-luat-hinh-su-2017",
-    "note": "Xác nhận khung hình phạt Khoản 1 với văn bản gốc."
-  },
-  {
     "id": "GD-021",
     "question": "Theo Luật Phòng, chống ma túy 2021, chất ma túy được định nghĩa như thế nào?",
     "expected_answer": "Theo Luật Phòng, chống ma túy 2021, chất ma túy là chất gây nghiện, chất hướng thần được quy định trong danh mục chất ma túy do Chính phủ ban hành.",
@@ -195,36 +46,6 @@
     "difficulty": "easy",
     "doc": "luat-phong-chong-ma-tuy-2021",
     "note": "Đối chiếu chính xác câu chữ định nghĩa với văn bản gốc."
-  },
-  {
-    "id": "GD-022",
-    "question": "Người nghiện ma túy được định nghĩa thế nào trong Luật Phòng, chống ma túy 2021?",
-    "expected_answer": "Người nghiện ma túy là người sử dụng chất ma túy, thuốc gây nghiện, thuốc hướng thần và bị lệ thuộc vào các chất này.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Điều 2",
-    "question_type": "definition",
-    "difficulty": "easy",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu câu chữ định nghĩa với văn bản gốc."
-  },
-  {
-    "id": "GD-023",
-    "question": "Người sử dụng trái phép chất ma túy được định nghĩa thế nào theo Luật Phòng, chống ma túy 2021?",
-    "expected_answer": "Người sử dụng trái phép chất ma túy là người có hành vi sử dụng chất ma túy mà không được sự cho phép của người hoặc cơ quan chuyên môn có thẩm quyền.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Điều 2",
-    "question_type": "definition",
-    "difficulty": "easy",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu câu chữ định nghĩa với văn bản gốc."
-  },
-  {
-    "id": "GD-024",
-    "question": "Tiền chất là gì theo Luật Phòng, chống ma túy 2021?",
-    "expected_answer": "Tiền chất là hóa chất không thể thiếu được trong quá trình điều chế, sản xuất chất ma túy, được quy định trong danh mục tiền chất do Chính phủ ban hành.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Điều 2",
-    "question_type": "definition",
-    "difficulty": "easy",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu câu chữ định nghĩa với văn bản gốc."
   },
   {
     "id": "GD-025",
@@ -237,16 +58,6 @@
     "note": "Đối chiếu câu chữ định nghĩa với văn bản gốc."
   },
   {
-    "id": "GD-026",
-    "question": "Luật Phòng, chống ma túy 2021 quy định những hành vi nào bị nghiêm cấm?",
-    "expected_answer": "Các hành vi bị nghiêm cấm bao gồm: trồng cây có chứa chất ma túy; sản xuất, tàng trữ, vận chuyển, mua bán, sử dụng trái phép chất ma túy; tổ chức, chứa chấp, cưỡng bức, lôi kéo người khác sử dụng trái phép chất ma túy; và các hành vi vi phạm khác liên quan đến ma túy được liệt kê trong điều luật.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Điều 5",
-    "question_type": "enumeration",
-    "difficulty": "medium",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu danh sách đầy đủ các hành vi bị nghiêm cấm với văn bản gốc."
-  },
-  {
     "id": "GD-027",
     "question": "Luật Phòng, chống ma túy 2021 quy định những hình thức cai nghiện nào?",
     "expected_answer": "Có hai hình thức chính là cai nghiện ma túy tự nguyện và cai nghiện ma túy bắt buộc. Cai nghiện tự nguyện được thực hiện tại gia đình, cộng đồng hoặc tại cơ sở cai nghiện ma túy; cai nghiện bắt buộc được thực hiện tại cơ sở cai nghiện ma túy công lập.",
@@ -256,85 +67,6 @@
     "doc": "luat-phong-chong-ma-tuy-2021"
   },
   {
-    "id": "GD-028",
-    "question": "Cai nghiện ma túy bắt buộc áp dụng đối với những đối tượng nào?",
-    "expected_answer": "Cai nghiện bắt buộc tại cơ sở cai nghiện áp dụng đối với người nghiện ma túy từ đủ 18 tuổi trở lên thuộc các trường hợp do luật quy định (ví dụ không đăng ký, không tham gia hoặc tự ý chấm dứt cai nghiện tự nguyện; bị chấm dứt quản lý sau cai; tái nghiện...).",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Chương V",
-    "question_type": "procedure",
-    "difficulty": "hard",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu danh sách đầy đủ các trường hợp bị áp dụng cai nghiện bắt buộc với văn bản gốc."
-  },
-  {
-    "id": "GD-029",
-    "question": "Người từ đủ 12 đến dưới 18 tuổi nghiện ma túy được xử lý cai nghiện như thế nào?",
-    "expected_answer": "Người nghiện ma túy từ đủ 12 tuổi đến dưới 18 tuổi thuộc các trường hợp luật định bị đưa vào cơ sở cai nghiện bắt buộc, nhưng việc này không phải là biện pháp xử lý vi phạm hành chính.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Chương V",
-    "question_type": "procedure",
-    "difficulty": "hard",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu điều khoản cụ thể và các trường hợp áp dụng với văn bản gốc."
-  },
-  {
-    "id": "GD-030",
-    "question": "Việc quản lý người sử dụng trái phép chất ma túy được quy định thế nào trong Luật Phòng, chống ma túy 2021?",
-    "expected_answer": "Luật quy định biện pháp quản lý người sử dụng trái phép chất ma túy do Ủy ban nhân dân cấp xã thực hiện trong một thời hạn nhất định nhằm phòng ngừa, ngăn chặn việc tiếp tục sử dụng và hỗ trợ người sử dụng.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Chương IV",
-    "question_type": "procedure",
-    "difficulty": "medium",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu chương/điều và thời hạn quản lý (ví dụ 01 năm) với văn bản gốc."
-  },
-  {
-    "id": "GD-031",
-    "question": "Chính sách của Nhà nước về phòng, chống ma túy được quy định ở đâu trong Luật Phòng, chống ma túy 2021?",
-    "expected_answer": "Chính sách của Nhà nước về phòng, chống ma túy được quy định tại Điều 3 của Luật, bao gồm các nội dung như ưu tiên nguồn lực, khuyến khích xã hội hóa, bảo vệ và hỗ trợ người tham gia phòng, chống ma túy.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Điều 3",
-    "question_type": "factual_lookup",
-    "difficulty": "medium",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu số điều và nội dung chính sách với văn bản gốc."
-  },
-  {
-    "id": "GD-032",
-    "question": "Luật Phòng, chống ma túy 2021 có hiệu lực thi hành từ ngày nào?",
-    "expected_answer": "Luật Phòng, chống ma túy 2021 có hiệu lực thi hành từ ngày 01 tháng 01 năm 2022.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, điều khoản thi hành",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "luat-phong-chong-ma-tuy-2021"
-  },
-  {
-    "id": "GD-033",
-    "question": "Cơ quan nào là lực lượng chuyên trách phòng, chống tội phạm về ma túy?",
-    "expected_answer": "Cơ quan chuyên trách phòng, chống tội phạm về ma túy thuộc Công an nhân dân giữ vai trò nòng cốt, phối hợp với các lực lượng chuyên trách thuộc Bộ đội Biên phòng, Cảnh sát biển và Hải quan.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Chương II",
-    "question_type": "authority",
-    "difficulty": "medium",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu danh sách lực lượng chuyên trách và điều khoản với văn bản gốc."
-  },
-  {
-    "id": "GD-034",
-    "question": "Kiểm soát các hoạt động hợp pháp liên quan đến ma túy bao gồm những hoạt động gì?",
-    "expected_answer": "Các hoạt động hợp pháp liên quan đến ma túy được kiểm soát bao gồm nghiên cứu, kiểm nghiệm, sản xuất, vận chuyển, bảo quản, tồn trữ, mua bán, phân phối, sử dụng, xuất khẩu, nhập khẩu, quá cảnh chất ma túy, tiền chất, thuốc gây nghiện, thuốc hướng thần và thuốc tiền chất vì mục đích y tế, nghiên cứu khoa học và các mục đích hợp pháp khác.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Chương III",
-    "question_type": "enumeration",
-    "difficulty": "medium",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu danh sách hoạt động và chương/điều với văn bản gốc."
-  },
-  {
-    "id": "GD-035",
-    "question": "Phân biệt người nghiện ma túy và người sử dụng trái phép chất ma túy theo pháp luật?",
-    "expected_answer": "Người sử dụng trái phép chất ma túy là người có hành vi sử dụng chất ma túy mà không được phép của cơ quan có thẩm quyền nhưng chưa ở mức lệ thuộc; người nghiện ma túy là người sử dụng và đã bị lệ thuộc vào chất ma túy, thuốc gây nghiện, thuốc hướng thần. Hai khái niệm được phân biệt và áp dụng biện pháp quản lý/cai nghiện khác nhau.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Điều 2",
-    "question_type": "comparison",
-    "difficulty": "hard",
-    "doc": "luat-phong-chong-ma-tuy-2021",
-    "note": "Đối chiếu câu chữ hai định nghĩa với văn bản gốc."
-  },
-  {
     "id": "GD-036",
     "question": "Nghị định 105/2021/NĐ-CP quy định về vấn đề gì?",
     "expected_answer": "Nghị định 105/2021/NĐ-CP quy định chi tiết và hướng dẫn thi hành một số điều của Luật Phòng, chống ma túy.",
@@ -342,46 +74,6 @@
     "question_type": "scope",
     "difficulty": "easy",
     "doc": "nghi-dinh-105-2021"
-  },
-  {
-    "id": "GD-037",
-    "question": "Theo Nghị định 105/2021/NĐ-CP, các cơ quan chuyên trách phòng, chống tội phạm về ma túy gồm những lực lượng nào?",
-    "expected_answer": "Các cơ quan chuyên trách phòng, chống tội phạm về ma túy gồm các lực lượng thuộc Công an nhân dân, Bộ đội Biên phòng, Cảnh sát biển Việt Nam và cơ quan Hải quan, với nhiệm vụ và phạm vi phối hợp được quy định cụ thể.",
-    "expected_context": "Nghị định 105/2021/NĐ-CP",
-    "question_type": "authority",
-    "difficulty": "medium",
-    "doc": "nghi-dinh-105-2021",
-    "note": "Đối chiếu điều khoản cụ thể về cơ quan chuyên trách trong Nghị định 105/2021 với văn bản gốc."
-  },
-  {
-    "id": "GD-038",
-    "question": "Nghị định 105/2021/NĐ-CP quy định trách nhiệm phối hợp giữa các cơ quan chuyên trách như thế nào?",
-    "expected_answer": "Nghị định quy định nguyên tắc, nội dung và cơ chế phối hợp giữa cơ quan chuyên trách phòng, chống tội phạm về ma túy thuộc Công an với các lực lượng Bộ đội Biên phòng, Cảnh sát biển và Hải quan trong phòng ngừa, phát hiện, đấu tranh với tội phạm về ma túy.",
-    "expected_context": "Nghị định 105/2021/NĐ-CP",
-    "question_type": "procedure",
-    "difficulty": "medium",
-    "doc": "nghi-dinh-105-2021",
-    "note": "Đối chiếu điều khoản cụ thể về cơ chế phối hợp với văn bản gốc."
-  },
-  {
-    "id": "GD-039",
-    "question": "Nghị định 105/2021/NĐ-CP hướng dẫn kiểm soát các hoạt động hợp pháp liên quan đến ma túy như thế nào?",
-    "expected_answer": "Nghị định hướng dẫn chi tiết về điều kiện, hồ sơ, trình tự, thủ tục cấp phép và quản lý đối với các hoạt động hợp pháp liên quan đến chất ma túy, tiền chất, thuốc gây nghiện, thuốc hướng thần và thuốc tiền chất.",
-    "expected_context": "Nghị định 105/2021/NĐ-CP",
-    "question_type": "procedure",
-    "difficulty": "medium",
-    "doc": "nghi-dinh-105-2021",
-    "note": "Xác nhận phạm vi nội dung này thuộc Nghị định 105/2021 (đối chiếu với văn bản gốc trong corpus)."
-  },
-  {
-    "id": "GD-040",
-    "question": "Danh mục chất ma túy và tiền chất ở Việt Nam được phân thành mấy danh mục?",
-    "expected_answer": "Danh mục được phân thành các nhóm: Danh mục I gồm các chất ma túy tuyệt đối cấm sử dụng trong y học và đời sống; Danh mục II và III gồm các chất ma túy được sử dụng hạn chế trong nghiên cứu, kiểm nghiệm, y tế; và Danh mục IV gồm các tiền chất.",
-    "expected_context": "Thông tư Danh mục chất ma túy và tiền chất, Phần phân loại danh mục",
-    "question_type": "enumeration",
-    "difficulty": "medium",
-    "doc": "thong-tu-danh-muc-ma-tuy",
-    "note": "Đối chiếu số lượng và tên gọi từng danh mục với văn bản gốc trong corpus."
   },
   {
     "id": "GD-041",
@@ -394,46 +86,6 @@
     "note": "Đối chiếu vị trí của heroin trong danh mục với văn bản gốc."
   },
   {
-    "id": "GD-042",
-    "question": "Methamphetamine (ma túy đá) thuộc danh mục nào?",
-    "expected_answer": "Methamphetamine thuộc Danh mục I, là nhóm các chất ma túy tuyệt đối cấm sử dụng trong y học và đời sống.",
-    "expected_context": "Thông tư Danh mục chất ma túy và tiền chất, Danh mục I",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "thong-tu-danh-muc-ma-tuy",
-    "note": "Đối chiếu vị trí của methamphetamine trong danh mục với văn bản gốc."
-  },
-  {
-    "id": "GD-043",
-    "question": "Cần sa (cannabis) có nằm trong danh mục chất ma túy của Việt Nam không?",
-    "expected_answer": "Có. Cần sa (cannabis) và các sản phẩm từ cây cần sa được liệt kê trong Danh mục I các chất ma túy tuyệt đối cấm sử dụng trong y học và đời sống.",
-    "expected_context": "Thông tư Danh mục chất ma túy và tiền chất, Danh mục I",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "thong-tu-danh-muc-ma-tuy",
-    "note": "Đối chiếu vị trí của cần sa trong danh mục với văn bản gốc."
-  },
-  {
-    "id": "GD-044",
-    "question": "Các tiền chất được xếp vào danh mục nào?",
-    "expected_answer": "Các tiền chất dùng trong điều chế, sản xuất chất ma túy được xếp vào Danh mục IV.",
-    "expected_context": "Thông tư Danh mục chất ma túy và tiền chất, Danh mục IV",
-    "question_type": "factual_lookup",
-    "difficulty": "easy",
-    "doc": "thong-tu-danh-muc-ma-tuy",
-    "note": "Đối chiếu số hiệu danh mục tiền chất với văn bản gốc."
-  },
-  {
-    "id": "GD-045",
-    "question": "Morphine được xếp vào danh mục chất ma túy nào?",
-    "expected_answer": "Morphine là chất ma túy được sử dụng trong lĩnh vực y tế và được xếp vào danh mục các chất ma túy được dùng hạn chế (Danh mục II hoặc III tùy quy định).",
-    "expected_context": "Thông tư Danh mục chất ma túy và tiền chất",
-    "question_type": "factual_lookup",
-    "difficulty": "medium",
-    "doc": "thong-tu-danh-muc-ma-tuy",
-    "note": "Đối chiếu chính xác morphine thuộc Danh mục II hay III với văn bản gốc."
-  },
-  {
     "id": "GD-046",
     "question": "Một người bị bắt khi đang cất giấu một lượng nhỏ heroin để sử dụng cá nhân thì bị xử lý theo tội gì?",
     "expected_answer": "Hành vi cất giấu trái phép chất ma túy không nhằm mục đích mua bán, vận chuyển hay sản xuất có thể cấu thành tội tàng trữ trái phép chất ma túy theo Điều 249 Bộ luật Hình sự; khung hình phạt phụ thuộc vào loại và khối lượng chất ma túy.",
@@ -444,21 +96,93 @@
     "note": "Đáp án mô tả khung pháp lý; ngưỡng khối lượng cụ thể cần đối chiếu văn bản gốc."
   },
   {
-    "id": "GD-047",
-    "question": "Một người tổ chức cho nhiều người khác cùng sử dụng ma túy tại nhà riêng thì bị xử lý theo tội gì?",
-    "expected_answer": "Hành vi này có thể cấu thành tội tổ chức sử dụng trái phép chất ma túy theo Điều 255 Bộ luật Hình sự.",
-    "expected_context": "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017), Điều 255",
-    "question_type": "scenario",
-    "difficulty": "medium",
-    "doc": "bo-luat-hinh-su-2017"
+    "id": "GD-049",
+    "question": "Ca sĩ Chi Dân bị truy tố về tội gì và hành vi phạm tội diễn ra như thế nào?",
+    "expected_answer": "Ca sĩ Chi Dân (Nguyễn Trung Hiếu) bị truy tố về tội Tổ chức sử dụng trái phép chất ma túy. Đêm 8/11/2024, cảnh sát bắt quả tang anh cùng anh trai Nguyễn Trung Tín và nhiều người đang tổ chức 'tiệc ma túy' tại căn nhà trên đường Cộng Hòa, quận Tân Bình, TP HCM. Chi Dân đã chủ động rủ cả nhóm sử dụng ma túy tổng hợp và đặt mua nước vui cho nhóm cùng sử dụng.",
+    "expected_context": "Bài báo: Anh em ca sĩ Chi Dân rủ nhiều người chơi ma túy (article_01); Công an TP HCM kết luận vụ ca sĩ Chi Dân (article_08)",
+    "question_type": "factual_lookup",
+    "difficulty": "easy",
+    "doc": "news/article_01"
   },
   {
-    "id": "GD-048",
-    "question": "Một người nghiện ma túy tự nguyện đăng ký cai nghiện thì có thể cai nghiện ở đâu?",
-    "expected_answer": "Người nghiện đăng ký cai nghiện tự nguyện có thể thực hiện tại gia đình, tại cộng đồng hoặc tại cơ sở cai nghiện ma túy, theo quy định về cai nghiện tự nguyện của Luật Phòng, chống ma túy 2021.",
-    "expected_context": "Luật Phòng, chống ma túy 2021, Chương V",
-    "question_type": "scenario",
+    "id": "GD-050",
+    "question": "Ca sĩ Miu Lê bị bắt ở đâu, vào thời điểm nào và về tội gì?",
+    "expected_answer": "Ca sĩ Miu Lê (Lê Ánh Nhật, 35 tuổi) bị Công an TP Hải Phòng khởi tố, bắt tạm giam ngày 16/5/2026 về hành vi Tổ chức sử dụng trái phép chất ma túy. Vụ việc bị phát hiện ngày 10/5/2026 khi cảnh sát kiểm tra khu vực bãi tắm Tùng Thu, đặc khu Cát Hải, và phát hiện Miu Lê cùng 5 người khác dương tính với Methamphetamine, Ketamine và MDMA.",
+    "expected_context": "Bài báo: Ca sĩ Miu Lê bị bắt với cáo buộc tổ chức sử dụng ma túy (article_06); Miu Lê bị khởi tố và tạm giam (article_10)",
+    "question_type": "factual_lookup",
+    "difficulty": "easy",
+    "doc": "news/article_06"
+  },
+  {
+    "id": "GD-051",
+    "question": "Ca sĩ Long Nhật bị bắt vì liên quan đến tội gì và đã khai sử dụng ma túy từ khi nào?",
+    "expected_answer": "Ca sĩ Long Nhật (Đinh Long Nhật, sinh năm 1967) bị Công an TP HCM bắt ngày 20/5/2026, liên quan đến chuyên án 426A, điều tra về các hành vi mua bán, tàng trữ và tổ chức sử dụng trái phép chất ma túy. Tại cơ quan điều tra, Long Nhật khai đã sử dụng ma túy đá từ Tết 2026 cùng với quản lý và thợ sửa nhà, mua từ người tài xế lái xe.",
+    "expected_context": "Bài báo: CLIP Ca sĩ Long Nhật sử dụng ma tuý từ khi nào, với ai (article_09); Ca sĩ Long Nhật bị bắt, showbiz Việt liên tiếp chấn động (article_15)",
+    "question_type": "factual_lookup",
+    "difficulty": "easy",
+    "doc": "news/article_09"
+  },
+  {
+    "id": "GD-052",
+    "question": "Diễn viên hài Trần Hữu Tín bị kết án bao nhiêu năm tù và về tội gì?",
+    "expected_answer": "Diễn viên hài Trần Hữu Tín (36 tuổi) bị TAND quận 8, TP HCM tuyên phạt 7 năm 6 tháng tù về tội Tổ chức sử dụng trái phép chất ma túy theo bản án sơ thẩm ngày 28/4/2023. HĐXX ghi nhận anh phạm tội lần đầu, không hưởng lợi và có nhiều đóng góp cho xã hội.",
+    "expected_context": "Bài báo: Diễn viên hài Trần Hữu Tín lãnh 7 năm 6 tháng tù (article_04)",
+    "question_type": "penalty",
+    "difficulty": "easy",
+    "doc": "news/article_04"
+  },
+  {
+    "id": "GD-053",
+    "question": "Rapper Mr. Nhân bị khởi tố về tội gì và trong bối cảnh vụ án nào?",
+    "expected_answer": "Rapper Mr. Nhân (Mai Thế Nhân, 34 tuổi) bị Công an TP HCM khởi tố ngày 28/5/2026 về tội Mua bán trái phép chất ma túy. Anh là một trong 140 người bị bắt và xử lý trong đường dây ma túy liên tỉnh do Đội 3 Phòng PC04 triệt phá, bắt nguồn từ việc phát hiện đối tượng Đặng Phan Thanh Tùng vận chuyển và bán lẻ ma túy tại khu vực Bình Dương.",
+    "expected_context": "Bài báo: Bắt tạm giam rapper Mr. Nhân liên quan chuyên án phá đường dây ma túy liên tỉnh (article_12)",
+    "question_type": "factual_lookup",
+    "difficulty": "easy",
+    "doc": "news/article_12"
+  },
+  {
+    "id": "GD-054",
+    "question": "Vụ án liên quan tiếp viên Vietnam Airlines có bao nhiêu bị can bị truy tố và về những tội danh nào?",
+    "expected_answer": "Viện KSND TP HCM truy tố 227 bị can (trong đó có 4 bị can bị truy nã xét xử vắng mặt) về các tội: Tàng trữ trái phép chất ma túy, Vận chuyển trái phép chất ma túy, Mua bán trái phép chất ma túy, Tổ chức sử dụng trái phép chất ma túy, Che giấu tội phạm, Không tố giác tội phạm, Chiếm giữ trái phép tài sản và Sử dụng tài liệu giả của cơ quan, tổ chức. Bị can Nguyễn Trung Hiếu (ca sĩ Chi Dân) bị truy tố tội Tổ chức sử dụng trái phép chất ma túy.",
+    "expected_context": "Bài báo: Vụ ma túy liên quan tiếp viên Vietnam Airlines - Truy tố người mẫu An Tây, Chi Dân và 225 bị can (article_03)",
+    "question_type": "enumeration",
     "difficulty": "medium",
-    "doc": "luat-phong-chong-ma-tuy-2021"
+    "doc": "news/article_03"
+  },
+  {
+    "id": "GD-055",
+    "question": "Người mẫu Andrea Aybar (An Tây) bị truy tố về những tội gì?",
+    "expected_answer": "Bị can Andrea Aybar Carmona (quốc tịch Tây Ban Nha, người mẫu An Tây) bị truy tố về hai tội: Tổ chức sử dụng trái phép chất ma túy và Tàng trữ trái phép chất ma túy trong vụ án liên quan đến đường dây vận chuyển ma túy từ Pháp về Việt Nam qua tiếp viên Vietnam Airlines. Tại cơ quan điều tra, An Tây tự nhận đã vi phạm pháp luật và hủy hoại sự nghiệp, cuộc sống của mình.",
+    "expected_context": "Bài báo: Vụ truy tố 227 bị can (article_03); Người mẫu An Tây: 'Em đã tự hủy hoại tương lai của mình' (article_11)",
+    "question_type": "factual_lookup",
+    "difficulty": "easy",
+    "doc": "news/article_11"
+  },
+  {
+    "id": "GD-056",
+    "question": "Những nghệ sĩ nổi tiếng nào của showbiz Việt đã bị bắt liên quan đến ma túy trong giai đoạn 2023-2026?",
+    "expected_answer": "Các nghệ sĩ nổi tiếng bị bắt liên quan ma túy giai đoạn 2023-2026 gồm: diễn viên hài Trần Hữu Tín (bị kết án 7 năm 6 tháng tù năm 2023), ca sĩ Chu Bin và nam vương Nhikolai Đinh (năm 2024), ca sĩ Chi Dân và người mẫu Andrea Aybar (bị bắt tháng 11/2024), nhà thiết kế Nguyễn Công Trí (đầu năm 2025), ca sĩ Miu Lê, ca sĩ Long Nhật, ca sĩ Sơn Ngọc Minh và rapper Mr. Nhân (tháng 5/2026).",
+    "expected_context": "Bài báo tổng hợp: Ca sĩ Long Nhật bị bắt, showbiz Việt liên tiếp chấn động (article_15); Chi Dân, Hữu Tín và loạt sao Việt gây ồn ào vì dính tới ma túy (article_16)",
+    "question_type": "cross_reference",
+    "difficulty": "hard",
+    "doc": "news/article_15"
+  },
+  {
+    "id": "GD-057",
+    "question": "Những nghệ sĩ nổi tiếng nào đã tham gia chiến dịch tuyên truyền 'không thử ma túy dù chỉ một lần'?",
+    "expected_answer": "Chiến dịch 'không thử ma túy dù chỉ một lần' do Cục Cảnh sát điều tra tội phạm về ma túy (C04) Bộ Công an khởi xướng, với sự tham gia của: NSND Xuân Bắc, NSƯT Thái Sơn, Hoa hậu H'hen Niê, diễn viên Đỗ Duy Nam, diễn viên Hà Việt Dũng, diễn viên Trung Ruồi, ca sĩ Đức Phúc, MC Vĩnh Phú và nhóm 1977 Vlog.",
+    "expected_context": "Bài báo: Nghệ sĩ Việt kêu gọi giới trẻ 'không thử ma túy dù chỉ một lần' (article_14)",
+    "question_type": "enumeration",
+    "difficulty": "medium",
+    "doc": "news/article_14"
+  },
+  {
+    "id": "GD-058",
+    "question": "Tại sao việc nghệ sĩ nổi tiếng sử dụng hoặc tổ chức sử dụng ma túy được xem là nguy hiểm hơn người bình thường?",
+    "expected_answer": "Theo quan điểm được nêu trong các bài báo, nghệ sĩ và người nổi tiếng không chỉ bán sản phẩm giải trí mà còn bán hình ảnh, lối sống và có sức ảnh hưởng lớn đến nhận thức của hàng triệu người trẻ. Khi họ vi phạm pháp luật về ma túy, hành vi đó dễ tạo ra tâm lý 'người tài có đặc quyền sai sót' và gây ra sự lệch chuẩn trong nhận thức xã hội, đặc biệt với giới trẻ vốn thần tượng họ.",
+    "expected_context": "Bài báo: Nghệ sĩ dính ma túy: Cần một 'lằn ranh đỏ' (article_17); NTK Nguyễn Công Trí bị bắt vì ma túy (article_20)",
+    "question_type": "comparison",
+    "difficulty": "hard",
+    "doc": "news/article_17"
   }
 ]
