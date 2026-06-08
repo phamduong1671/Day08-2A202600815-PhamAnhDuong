@@ -5,9 +5,10 @@
 - **Framework:** DeepEval `4.0.5`
 - **Judge model:** OpenAI `gpt-4o-mini`
 - **Pipeline đánh giá:** `src.task10.generate_with_citation` (retrieval Weaviate hybrid + generation `gpt-4o-mini`)
-- **Golden dataset:** 2 câu chấm thành công (giới hạn EVAL_LIMIT=2)
-- **Evaluation mode:** Smoke test sample
-- **Threshold pass:** 0.7 · **Thời gian chạy:** 3.6 phút
+- **Golden dataset:** 20 câu chấm thành công
+- **Evaluation mode:** Full dataset
+- **Workers:** 3
+- **Threshold pass:** 0.7 · **Thời gian chạy:** 12.2 phút
 
 
 ---
@@ -16,11 +17,11 @@
 
 | Metric | Config A (hybrid + rerank) | Config B (no rerank) | Δ (A − B) |
 |--------|---------------------------|----------------------|-----------|
-| Faithfulness | 1.000 | 1.000 | 0.000 |
-| Answer Relevancy | 1.000 | 1.000 | 0.000 |
-| Context Recall | 1.000 | 1.000 | 0.000 |
-| Context Precision | 1.000 | 1.000 | 0.000 |
-| **Average** | **1.000** | **1.000** | **0.000** |
+| Faithfulness | 0.744 | 0.748 | -0.004 |
+| Answer Relevancy | 0.953 | 0.892 | 0.061 |
+| Context Recall | 0.936 | 0.983 | -0.047 |
+| Context Precision | 0.971 | 0.761 | 0.210 |
+| **Average** | **0.901** | **0.846** | **0.055** |
 
 ---
 
@@ -32,7 +33,7 @@
 **Config B — Hybrid, no Rerank:** giống A nhưng bỏ bước cross-encoder; lấy trực tiếp thứ hạng sau RRF; không dùng threshold fallback theo score vì RRF score có thang đo khác cross-encoder.
 
 
-**Kết luận:** Config tốt hơn theo điểm trung bình là **ngang nhau** (Δ average = 0.000). Reranking thường nâng Context Precision rõ nhất vì nó đẩy chunk liên quan lên đầu; nếu Δ nhỏ, retrieval gốc đã đủ tốt cho corpus pháp luật có cấu trúc rõ.
+**Kết luận:** Config tốt hơn theo điểm trung bình là **A (có rerank)** (Δ average = 0.055). Reranking thường nâng Context Precision rõ nhất vì nó đẩy chunk liên quan lên đầu; nếu Δ nhỏ, retrieval gốc đã đủ tốt cho corpus pháp luật có cấu trúc rõ.
 
 
 ---
@@ -41,10 +42,11 @@
 
 | # | ID | Question | Faith | Relev | Recall | Prec | Avg |
 |---|----|----------|-------|-------|--------|------|-----|
-| 1 | GD-001 | Tội tàng trữ trái phép chất ma túy được quy định tại điều nào của Bộ l | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 |
-| 2 | GD-002 | Khung hình phạt thấp nhất đối với tội tàng trữ trái phép chất ma túy l | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 |
+| 1 | GD-050 | Ca sĩ Miu Lê bị bắt ở đâu, vào thời điểm nào và về tội gì? | 0.333 | 0.667 | 1.000 | 1.000 | 0.750 |
+| 2 | GD-052 | Diễn viên hài Trần Hữu Tín bị kết án bao nhiêu năm tù và về tội gì? | 0.000 | 1.000 | 1.000 | 1.000 | 0.750 |
+| 3 | GD-053 | Rapper Mr. Nhân bị khởi tố về tội gì và trong bối cảnh vụ án nào? | 0.800 | 1.000 | 0.214 | 1.000 | 0.754 |
 
-**Phân tích:** không có case dưới threshold trong sample hiện tại. Kết quả này chỉ xác nhận smoke test 2 Q&A chạy được; chưa thay thế full evaluation.
+**Phân tích:** không có case dưới threshold trong full dataset hiện tại. Các case bottom vẫn nên được audit thủ công vì một metric riêng lẻ có thể thấp dù điểm trung bình còn trên ngưỡng.
 
 
 ---
@@ -56,9 +58,9 @@
 **Action:** Chốt ground truth cho các câu có `note`  
 **Expected impact:** Đối chiếu khối lượng/khung hình phạt với văn bản gốc trong corpus, bỏ ghi chú. → Context Recall & Faithfulness tăng vì judge so với đáp án chính xác.  
 
-### Cải tiến 2: Bổ sung Q&A cho mảng tin tức (news/)
-**Action:** Bổ sung Q&A cho mảng tin tức (news/)  
-**Expected impact:** 48 câu hiện tại 100% là pháp luật; 20 bài báo nghệ sĩ chưa được đánh giá. → Phủ kín pipeline, lộ điểm yếu retrieval trên văn bản phi cấu trúc.  
+### Cải tiến 2: Mở rộng Q&A cho mảng tin tức (news/)
+**Action:** Mở rộng Q&A cho mảng tin tức (news/)  
+**Expected impact:** Dataset hiện đã có câu news, nhưng vẫn nên tăng độ phủ theo nhiều bài và nhiều dạng câu hỏi. → Lộ rõ hơn điểm yếu retrieval trên văn bản phi cấu trúc.  
 
 ### Cải tiến 3: Tăng top_k retrieval cho câu cross-reference
 **Action:** Tăng top_k retrieval cho câu cross-reference  
@@ -72,4 +74,22 @@
 | ID | Doc | Diff | Faith | Relev | Recall | Prec |
 |----|-----|------|-------|-------|--------|------|
 | GD-001 | bo-luat-hinh-su-2017 | easy | 1.000 | 1.000 | 1.000 | 1.000 |
-| GD-002 | bo-luat-hinh-su-2017 | easy | 1.000 | 1.000 | 1.000 | 1.000 |
+| GD-005 | bo-luat-hinh-su-2017 | medium | 0.833 | 1.000 | 1.000 | 1.000 |
+| GD-008 | bo-luat-hinh-su-2017 | hard | 1.000 | 1.000 | 1.000 | 1.000 |
+| GD-017 | bo-luat-hinh-su-2017 | hard | 0.700 | 0.900 | 0.500 | 1.000 |
+| GD-021 | luat-phong-chong-ma-tuy-2021 | easy | 1.000 | 1.000 | 1.000 | 1.000 |
+| GD-025 | luat-phong-chong-ma-tuy-2021 | medium | 0.833 | 1.000 | 1.000 | 1.000 |
+| GD-027 | luat-phong-chong-ma-tuy-2021 | medium | 0.857 | 1.000 | 1.000 | 0.917 |
+| GD-036 | nghi-dinh-105-2021 | easy | 0.500 | 0.833 | 1.000 | 0.750 |
+| GD-041 | thong-tu-danh-muc-ma-tuy | easy | 0.667 | 1.000 | 1.000 | 1.000 |
+| GD-046 | bo-luat-hinh-su-2017 | medium | 1.000 | 1.000 | 1.000 | 1.000 |
+| GD-049 | news/article_01 | easy | 0.889 | 0.889 | 1.000 | 1.000 |
+| GD-050 | news/article_06 | easy | 0.333 | 0.667 | 1.000 | 1.000 |
+| GD-051 | news/article_09 | easy | 0.500 | 1.000 | 1.000 | 1.000 |
+| GD-052 | news/article_04 | easy | 0.000 | 1.000 | 1.000 | 1.000 |
+| GD-053 | news/article_12 | easy | 0.800 | 1.000 | 0.214 | 1.000 |
+| GD-054 | news/article_03 | medium | 1.000 | 1.000 | 1.000 | 0.867 |
+| GD-055 | news/article_11 | easy | 0.500 | 1.000 | 1.000 | 1.000 |
+| GD-056 | news/article_15 | hard | 0.857 | 0.778 | 1.000 | 1.000 |
+| GD-057 | news/article_14 | medium | 0.750 | 1.000 | 1.000 | 1.000 |
+| GD-058 | news/article_17 | hard | 0.857 | 1.000 | 1.000 | 0.887 |

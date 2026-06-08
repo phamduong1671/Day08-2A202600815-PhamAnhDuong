@@ -30,6 +30,7 @@ import json
 import os
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 # Generation đã chuyển sang OpenAI (gpt-4o-mini) nên pipeline không cần GPU.
@@ -57,6 +58,8 @@ THRESHOLD = 0.7
 EVAL_LIMIT_RAW = os.getenv("EVAL_LIMIT", "2")
 EVAL_LIMIT = int(EVAL_LIMIT_RAW) if EVAL_LIMIT_RAW.strip() else 2
 EVAL_LIMIT = None if EVAL_LIMIT == 0 else EVAL_LIMIT  # 0 = chạy hết
+EVAL_WORKERS_RAW = os.getenv("EVAL_WORKERS", "1")
+EVAL_WORKERS = max(1, int(EVAL_WORKERS_RAW) if EVAL_WORKERS_RAW.strip() else 1)
 
 # Tên metric -> nhãn hiển thị (giữ thứ tự ổn định cho mọi bảng).
 METRIC_LABELS = {
@@ -136,45 +139,92 @@ def score_config(
         list rows: {id, question, doc, difficulty, faithfulness, answer_relevancy,
                     contextual_recall, contextual_precision}  (score None nếu lỗi)
     """
+    total = len(golden_dataset)
+    if EVAL_WORKERS == 1:
+        rows = []
+        for i, item in enumerate(golden_dataset, 1):
+            rows.append(
+                score_item(
+                    i,
+                    total,
+                    item,
+                    use_reranking=use_reranking,
+                    score_threshold=score_threshold,
+                    judge=judge,
+                )
+            )
+        return rows
+
+    print(f"  Parallel mode: {EVAL_WORKERS} workers", flush=True)
+    rows_by_index: dict[int, dict] = {}
+    with ThreadPoolExecutor(max_workers=EVAL_WORKERS) as executor:
+        future_map = {
+            executor.submit(
+                score_item,
+                i,
+                total,
+                item,
+                use_reranking,
+                score_threshold,
+                judge,
+            ): i
+            for i, item in enumerate(golden_dataset, 1)
+        }
+        for done_count, future in enumerate(as_completed(future_map), 1):
+            i = future_map[future]
+            try:
+                rows_by_index[i] = future.result()
+            except Exception as e:
+                item = golden_dataset[i - 1]
+                print(f"      ⚠ worker error [{i}/{total}] {item.get('id', '')}: {e}", flush=True)
+                rows_by_index[i] = {**_meta(item), **{m: None for m in METRIC_LABELS}}
+            print(f"  Completed {done_count}/{total}", flush=True)
+    return [rows_by_index[i] for i in range(1, total + 1)]
+
+
+def score_item(
+    i: int,
+    total: int,
+    item: dict,
+    use_reranking: bool,
+    score_threshold: float,
+    judge,
+) -> dict:
+    """Chạy RAG + 4 metrics cho một câu hỏi."""
     from deepeval.test_case import LLMTestCase
     from src.task10_generation import generate_with_citation
 
-    rows = []
-    total = len(golden_dataset)
-    for i, item in enumerate(golden_dataset, 1):
-        question = item["question"]
-        print(f"  [{i}/{total}] {item.get('id', '')} {question[:60]}...", flush=True)
+    question = item["question"]
+    print(f"  [{i}/{total}] {item.get('id', '')} {question[:60]}...", flush=True)
 
+    try:
+        result = generate_with_citation(
+            question,
+            use_reranking=use_reranking,
+            score_threshold=score_threshold,
+        )
+        retrieval_context = [c["content"] for c in result.get("sources", [])]
+        if not retrieval_context:
+            retrieval_context = ["(không có context được truy hồi)"]
+        test_case = LLMTestCase(
+            input=question,
+            actual_output=result["answer"],
+            expected_output=item["expected_answer"],
+            retrieval_context=retrieval_context,
+        )
+    except Exception as e:  # pipeline lỗi (Ollama/Weaviate) → ghi None, không dừng
+        print(f"      ⚠ pipeline error [{item.get('id', '')}]: {e}", flush=True)
+        return {**_meta(item), **{m: None for m in METRIC_LABELS}}
+
+    row = {**_meta(item)}
+    for name, metric in build_metrics(judge).items():
         try:
-            result = generate_with_citation(
-                question,
-                use_reranking=use_reranking,
-                score_threshold=score_threshold,
-            )
-            retrieval_context = [c["content"] for c in result.get("sources", [])]
-            if not retrieval_context:
-                retrieval_context = ["(không có context được truy hồi)"]
-            test_case = LLMTestCase(
-                input=question,
-                actual_output=result["answer"],
-                expected_output=item["expected_answer"],
-                retrieval_context=retrieval_context,
-            )
-        except Exception as e:  # pipeline lỗi (Ollama/Weaviate) → ghi None, không dừng
-            print(f"      ⚠ pipeline error: {e}", flush=True)
-            rows.append({**_meta(item), **{m: None for m in METRIC_LABELS}})
-            continue
-
-        row = {**_meta(item)}
-        for name, metric in build_metrics(judge).items():
-            try:
-                metric.measure(test_case)
-                row[name] = round(float(metric.score), 3)
-            except Exception as e:
-                print(f"      ⚠ metric {name} error: {e}", flush=True)
-                row[name] = None
-        rows.append(row)
-    return rows
+            metric.measure(test_case)
+            row[name] = round(float(metric.score), 3)
+        except Exception as e:
+            print(f"      ⚠ metric {name} error [{item.get('id', '')}]: {e}", flush=True)
+            row[name] = None
+    return row
 
 
 def _meta(item: dict) -> dict:
@@ -239,6 +289,7 @@ def export_results(results: dict[str, list[dict]], elapsed: float):
         f"- **Golden dataset:** {agg_a['n_scored']} câu chấm thành công"
         f"{f' (giới hạn EVAL_LIMIT={EVAL_LIMIT})' if EVAL_LIMIT else ''}\n"
         f"- **Evaluation mode:** {'Smoke test sample' if EVAL_LIMIT else 'Full dataset'}\n"
+        f"- **Workers:** {EVAL_WORKERS}\n"
         f"- **Threshold pass:** {THRESHOLD} · **Thời gian chạy:** {elapsed/60:.1f} phút\n"
     )
 
@@ -295,9 +346,11 @@ def export_results(results: dict[str, list[dict]], elapsed: float):
             "**retrieval** (không lấy đúng điều luật) hay **generation** (lấy đúng nhưng trả lời sai).\n"
         )
     else:
+        eval_scope = "sample hiện tại" if EVAL_LIMIT else "full dataset hiện tại"
         lines.append(
-            "\n**Phân tích:** không có case dưới threshold trong sample hiện tại. "
-            "Kết quả này chỉ xác nhận smoke test 2 Q&A chạy được; chưa thay thế full evaluation.\n"
+            f"\n**Phân tích:** không có case dưới threshold trong {eval_scope}. "
+            "Các case bottom vẫn nên được audit thủ công vì một metric riêng lẻ có thể thấp "
+            "dù điểm trung bình còn trên ngưỡng.\n"
         )
 
     # Recommendations
@@ -306,9 +359,9 @@ def export_results(results: dict[str, list[dict]], elapsed: float):
         ("Chốt ground truth cho các câu có `note`",
          "Đối chiếu khối lượng/khung hình phạt với văn bản gốc trong corpus, bỏ ghi chú. "
          "→ Context Recall & Faithfulness tăng vì judge so với đáp án chính xác."),
-        ("Bổ sung Q&A cho mảng tin tức (news/)",
-         "48 câu hiện tại 100% là pháp luật; 20 bài báo nghệ sĩ chưa được đánh giá. "
-         "→ Phủ kín pipeline, lộ điểm yếu retrieval trên văn bản phi cấu trúc."),
+        ("Mở rộng Q&A cho mảng tin tức (news/)",
+         "Dataset hiện đã có câu news, nhưng vẫn nên tăng độ phủ theo nhiều bài và nhiều dạng câu hỏi. "
+         "→ Lộ rõ hơn điểm yếu retrieval trên văn bản phi cấu trúc."),
         ("Tăng top_k retrieval cho câu cross-reference",
          "Các câu tổng hợp nhiều điều luật cần nhiều evidence hơn (top_k 5 → 8). "
          "→ Context Recall tăng cho nhóm câu hard."),
@@ -355,7 +408,7 @@ def _deepeval_version() -> str:
 
 def main():
     golden = load_golden_dataset()
-    print(f"Loaded {len(golden)} test cases. Judge = {JUDGE_MODEL}\n")
+    print(f"Loaded {len(golden)} test cases. Judge = {JUDGE_MODEL}. Workers = {EVAL_WORKERS}\n")
     if not os.getenv("OPENAI_API_KEY"):
         print("⚠ Chưa có OPENAI_API_KEY trong môi trường — judge sẽ lỗi.", flush=True)
 
