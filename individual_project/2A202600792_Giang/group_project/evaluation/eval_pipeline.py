@@ -475,7 +475,7 @@ def export_results(comparison: dict, configs: dict[str, dict] | None = None) -> 
 
     content = "\n".join(lines)
     RESULTS_PATH.write_text(content, encoding="utf-8")
-    print(f"\n✓ Đã ghi kết quả vào {RESULTS_PATH}")
+    print(f"\n Đã ghi kết quả vào {RESULTS_PATH}")
     return content
 
 
@@ -537,7 +537,6 @@ if __name__ == "__main__":
         #     # pipeline_factory=lambda params: RAGPipeline(**params),
         # )
         # export_results(comparison)
-        print(
-            "⚠ Hãy import RAG pipeline thật ở khối __main__ rồi chạy lại "
-            "(hoặc dùng `--demo` để smoke-test harness)."
+        raise NotImplementedError(
+            "Cắm RAG pipeline thật vào phần main để chạy đánh giá."
         )
