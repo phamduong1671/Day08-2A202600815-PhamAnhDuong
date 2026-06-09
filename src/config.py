@@ -94,10 +94,22 @@ def embed_query(text: str) -> list[float]:
 
 def get_weaviate_client():
     """
-    Kết nối Weaviate local. KHÔNG cache bằng lru_cache (client có vòng đời/đóng kết nối).
+    Kết nối Weaviate: dùng Weaviate Cloud nếu có WEAVIATE_URL + WEAVIATE_API_KEY,
+    ngược lại fallback sang local Docker.
+    KHÔNG cache bằng lru_cache (client có vòng đời/đóng kết nối).
     Raise nếu Weaviate chưa chạy — caller bắt và trả [] để demo không vỡ.
     """
     import weaviate
+
+    url = os.getenv("WEAVIATE_URL", "").strip()
+    api_key = os.getenv("WEAVIATE_API_KEY", "").strip()
+    if url and api_key:
+        from weaviate.classes.init import Auth
+
+        return weaviate.connect_to_weaviate_cloud(
+            cluster_url=url,
+            auth_credentials=Auth.api_key(api_key),
+        )
 
     return weaviate.connect_to_local()
 

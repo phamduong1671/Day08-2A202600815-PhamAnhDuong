@@ -14,55 +14,8 @@ const exactPhrase = document.querySelector("#exactPhrase");
 const STORAGE_KEY = "rag-chat-messages-v2";
 const SESSION_ID = "html-ui";
 
-const demoSources = [
-  {
-    content:
-      "Luật Phòng, chống ma túy 2021 quy định trách nhiệm phòng, chống ma túy, quản lý người sử dụng trái phép chất ma túy và cai nghiện ma túy.",
-    score: 0.921,
-    source: "hybrid",
-    metadata: {
-      source: "Luật Phòng, chống ma túy 2021",
-      source_path: "data/standardized/legal/luat-phong-chong-ma-tuy-2021.md",
-      type: "legal",
-    },
-  },
-  {
-    content:
-      "Bộ luật Hình sự 2015, sửa đổi bổ sung 2017, Chương XX quy định các tội phạm về ma túy, trong đó có tội tàng trữ trái phép chất ma túy.",
-    score: 0.896,
-    source: "hybrid",
-    metadata: {
-      source: "Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017)",
-      source_path: "data/standardized/legal/bo-luat-hinh-su-2017.md",
-      type: "legal",
-    },
-  },
-  {
-    content:
-      "Nghị định 105/2021/NĐ-CP hướng dẫn thi hành một số điều của Luật Phòng, chống ma túy.",
-    score: 0.742,
-    source: "hybrid",
-    metadata: {
-      source: "Nghị định 105/2021/NĐ-CP",
-      source_path: "data/standardized/legal/nghi-dinh-105-2021.md",
-      type: "legal",
-    },
-  },
-];
-
-const initialMessages = [
-  {
-    role: "user",
-    content: "Tôi tàng trữ trái phép chất ma túy bị xử lý như thế nào?",
-  },
-  {
-    role: "assistant",
-    content:
-      "Tội tàng trữ trái phép chất ma túy được quy định tại Điều 249 Bộ luật Hình sự 2015 (sửa đổi, bổ sung 2017). Người phạm tội có thể bị phạt tù từ 01 năm đến chung thân tùy theo khối lượng và tính chất của chất ma túy. Ngoài ra, còn có thể bị phạt tiền từ 5 triệu đồng đến 500 triệu đồng, phạt bổ sung và các hình phạt khác theo quy định của pháp luật.\n\nCụ thể về hành vi tàng trữ trái phép chất ma túy được hiểu là việc cất giữ, giấu, cất giữ hoặc để dành trái phép chất ma túy dưới bất kỳ hình thức nào. [Luật Phòng, chống ma túy 2021]",
-    sources: demoSources,
-    retrieval_source: "hybrid",
-  },
-];
+const WELCOME_TEXT =
+  "Xin chào! Hãy đặt câu hỏi về pháp luật phòng, chống ma túy. Tôi sẽ truy xuất tài liệu và trả lời kèm trích dẫn nguồn.";
 
 let messages = loadMessages();
 let latestSources = getLatestSources(messages);
@@ -70,9 +23,9 @@ let latestSources = getLatestSources(messages);
 function loadMessages() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    return saved.length ? saved : structuredClone(initialMessages);
+    return Array.isArray(saved) ? saved : [];
   } catch {
-    return structuredClone(initialMessages);
+    return [];
   }
 }
 
@@ -82,7 +35,7 @@ function saveMessages() {
 
 function getLatestSources(items) {
   const lastWithSources = [...items].reverse().find((item) => item.sources?.length);
-  return lastWithSources?.sources || demoSources;
+  return lastWithSources?.sources || [];
 }
 
 function escapeHtml(value) {
@@ -127,30 +80,38 @@ function renderMessage(message) {
 }
 
 function shortDescription(source) {
-  const metadata = source.metadata || {};
   const content = fixText(source.preview || source.content || "");
-  const type = source.type || metadata.type;
-  if (type === "news") return content.slice(0, 86) || "Bài viết tin tức liên quan";
-  return content.slice(0, 86) || "Quốc hội nước Cộng hòa xã hội chủ nghĩa Việt Nam";
+  return content.replace(/\s+/g, " ").trim().slice(0, 120);
 }
 
 function articleLabel(source) {
+  // Derive a real label from the actual chunk content, not a hardcoded guess.
+  const content = fixText(source.content || source.preview || "");
+  const dieu = content.match(/Điều\s+(\d+[a-z]?)/i);
+  if (dieu) return `Điều ${dieu[1]}`;
+  const chuong = content.match(/Chương\s+([IVXLCDM]+|\d+)/i);
+  if (chuong) return `Chương ${chuong[1]}`;
   const path = source.source_path || source.metadata?.source_path || "";
-  const match = path.match(/dieu[-_\s]*(\d+)/i);
-  if (match) return `Điều ${match[1]}`;
-  const title = fixText(source.source || source.citation || source.metadata?.source || "");
-  if (title.includes("Hình sự")) return "Điều 249";
-  if (title.includes("Nghị định")) return "Điều 2";
-  return "Điều 3";
+  const fromPath = path.match(/dieu[-_\s]*(\d+)/i);
+  if (fromPath) return `Điều ${fromPath[1]}`;
+  const type = source.type || source.metadata?.type;
+  if (type === "news") return "Bản tin";
+  const idx = source.chunk_index;
+  return Number.isInteger(idx) ? `Trích đoạn #${idx}` : "Trích đoạn";
 }
 
 function renderSources(items) {
-  const cards = (items.length ? items : demoSources).slice(0, 3);
+  if (!items.length) {
+    sources.innerHTML =
+      '<p class="sources-empty">Chưa có nguồn — hãy đặt một câu hỏi để xem tài liệu trích dẫn.</p>';
+    return;
+  }
+  const cards = items.slice(0, 3);
   sources.innerHTML = cards
     .map((source) => {
       const metadata = source.metadata || {};
       const title = fixText(source.citation || source.source || metadata.source || metadata.title || "Source document");
-      const score = Number(source.score || 0).toFixed(3);
+      const score = Math.min(1, Number(source.score || 0)).toFixed(3);
       return `
         <article class="source-card">
           <div class="pdf-icon">PDF</div>
@@ -168,9 +129,17 @@ function renderSources(items) {
     .join("");
 }
 
+function renderWelcome() {
+  renderMessage({ role: "assistant", content: WELCOME_TEXT, time: currentTime() });
+}
+
 function renderAll() {
   chat.innerHTML = "";
-  messages.forEach(renderMessage);
+  if (messages.length === 0) {
+    renderWelcome();
+  } else {
+    messages.forEach(renderMessage);
+  }
   latestSources = getLatestSources(messages);
   renderSources(latestSources);
 }
@@ -200,6 +169,7 @@ async function ask(question) {
         question,
         session_id: SESSION_ID,
         top_k: Number(topK.value),
+        score_threshold: Number(threshold.value),
         exact_phrase: Boolean(exactPhrase?.checked),
       }),
     });
@@ -260,8 +230,8 @@ threshold.addEventListener("input", () => {
 clearChat.addEventListener("click", () => {
   localStorage.removeItem("rag-chat-messages");
   localStorage.removeItem(STORAGE_KEY);
-  messages = structuredClone(initialMessages);
-  latestSources = structuredClone(demoSources);
+  messages = [];
+  latestSources = [];
   saveMessages();
   renderAll();
   fetch("/api/reset", {

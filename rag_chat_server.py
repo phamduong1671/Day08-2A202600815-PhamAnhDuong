@@ -79,6 +79,8 @@ class ChatHandler(BaseHTTPRequestHandler):
             top_k = int(payload.get("top_k") or 5)
             session_id = str(payload.get("session_id") or DEFAULT_SESSION_ID)
             exact_phrase = bool(payload.get("exact_phrase"))
+            raw_threshold = payload.get("score_threshold")
+            score_threshold = None if raw_threshold is None else float(raw_threshold)
             if not question:
                 raise ValueError("Question is required.")
 
@@ -89,6 +91,7 @@ class ChatHandler(BaseHTTPRequestHandler):
                 session_id=session_id,
                 top_k=max(3, min(top_k, 8)),
                 exact_phrase=exact_phrase,
+                score_threshold=score_threshold,
             )
             response = {
                 "answer": str(result.get("answer") or "").strip()

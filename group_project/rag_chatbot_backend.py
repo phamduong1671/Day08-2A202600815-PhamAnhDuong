@@ -185,6 +185,7 @@ def answer_question(
     session_id: str = "default",
     top_k: int = 5,
     exact_phrase: bool = False,
+    score_threshold: float | None = None,
 ) -> dict[str, Any]:
     """
     API chính cho UI.
@@ -206,6 +207,7 @@ def answer_question(
     result = generate_with_citation(
         query=question,
         top_k=top_k,
+        score_threshold=score_threshold,
         conversation_history=memory.as_messages(),
         retrieval_query=contextual_query,
     )
@@ -253,6 +255,7 @@ def chat(
     session_id: str = "default",
     top_k: int = 5,
     exact_phrase: bool = False,
+    score_threshold: float | None = None,
 ) -> dict[str, Any]:
     """Alias ngắn cho UI Streamlit/Gradio/Chainlit."""
     return answer_question(
@@ -260,6 +263,7 @@ def chat(
         session_id=session_id,
         top_k=top_k,
         exact_phrase=exact_phrase,
+        score_threshold=score_threshold,
     )
 
 

@@ -369,6 +369,14 @@ output {
   gap: 10px;
 }
 
+.sources-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 14px 8px;
+  color: var(--muted, #8a8170);
+  font-size: 0.9rem;
+}
+
 .source-card {
   min-height: 108px;
   border: 1px solid var(--line);

@@ -416,6 +416,23 @@ cp .env.example .env
 
 ---
 
+## Chạy Web UI (Chatbot)
+
+Backend HTTP thật (`rag_chat_server.py`) vừa phục vụ giao diện trong `web/`, vừa cung
+cấp các API `/api/chat`, `/api/reset`, `/api/health` gọi thẳng vào RAG pipeline thật.
+
+```bash
+./run_web.sh
+# hoặc: .venv/bin/python rag_chat_server.py
+```
+
+Mở http://localhost:8000
+
+> Lưu ý: phải chạy bằng `.venv` (nơi cài dependencies). Chạy bằng `python` hệ thống
+> sẽ lỗi vì thiếu thư viện, khi đó UI chỉ hiển thị thông báo lỗi kết nối backend.
+
+---
+
 ## Chấm Điểm
 
 ### Tổng Quan Phân Bổ Điểm
